@@ -43,6 +43,7 @@ class EnsembleExecutionBackend(BaseBackend):
         enable_workstealing: bool = False,
         checkpoint_dir: str | None = None,
         mpi_flavour: str = "mpich",
+        mpi_config: MPIConfig | None = None,
         nlevels: int = 0,
         nleafs: int | None = None,
         cpus: list[int] | None = None,
@@ -64,6 +65,7 @@ class EnsembleExecutionBackend(BaseBackend):
             enable_workstealing: Allow idle workers to steal tasks from busy ones.
             checkpoint_dir: Directory for task checkpoints. Auto-generated if not provided.
             mpi_flavour: MPI implementation to use (e.g., "mpich", "openmpi").
+            mpi_config: Configuration to build the mpi command.
             nlevels: Number of hierarchy levels in the launcher tree.
             nleafs: Number of leaf nodes. Defaults to the number of available nodes.
             cpus: List of CPU IDs available for tasks. Defaults to all CPUs.
@@ -96,7 +98,7 @@ class EnsembleExecutionBackend(BaseBackend):
             enable_workstealing=enable_workstealing,
             cluster=True,
             checkpoint_dir=checkpoint_dir or os.path.join(os.getcwd(), f"ckpt_{uuid.uuid4()}"),
-            mpi_config=MPIConfig(flavor=mpi_flavour),
+            mpi_config=MPIConfig(flavor=mpi_flavour) if mpi_config is None else mpi_config,
         )
         cpus = cpus or list(range(os.cpu_count() or 1))
         ngpus = len(gpus) if gpus is not None else 0
