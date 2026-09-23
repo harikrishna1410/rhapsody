@@ -50,6 +50,7 @@ class EnsembleExecutionBackend(BaseBackend):
         gpus: list[int] | None = None,
         client_only: bool = False,
         node_id: str = "global",
+        hosts: list[str] | None = None,
     ):
         """Initialize the Ensemble Launcher execution backend.
 
@@ -73,6 +74,7 @@ class EnsembleExecutionBackend(BaseBackend):
             client_only: If True, only start the client without launching the ensemble.
             node_id: Scheduler node ID for the ClusterClient to connect to.
                 "global" (default) connects to the global master node.
+            hosts: List of hosts to launch the backend on.
         """
         super().__init__(name=name)
 
@@ -82,6 +84,7 @@ class EnsembleExecutionBackend(BaseBackend):
         self._callback_func: Callable = lambda t, s: None
         self._client_only = client_only
         self._node_id = node_id
+        self._hosts = hosts
 
         task_executor_name = ["async_loky", "async_mpi"]
 
@@ -159,6 +162,7 @@ class EnsembleExecutionBackend(BaseBackend):
                 ensemble_file={},
                 system_config=self._sys_config,
                 launcher_config=self._launcher_config,
+                Nodes=self._hosts,
             )
             await asyncio.to_thread(self._el.start, wait_time=5)
 
